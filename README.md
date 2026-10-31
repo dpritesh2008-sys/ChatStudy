@@ -73,54 +73,80 @@ User authentication mechanisms are essential to ensure secure and authorized acc
 Client-server chat applications are versatile tools that facilitate real-time communication between users over a network. They incorporate various components, including server-side and client-side elements, and must consider factors such as security, scalability, and concurrency. As technology continues to advance, client-server chat applications remain integral for collaborative communication in various domains.
 
 Client-server chat applications are foundational to real-time communication over networks. They incorporate principles of socket programming, communication protocols, and security mechanisms to provide a seamless user experience. Understanding the basics of client-server chat applications is essential for developers involved in networked application development, as they form the backbone of various collaborative communication systems. As technology evolves, chat applications continue to adapt, incorporating new features and technologies to enhance user interaction and connectivity.
-
-## Program:
-## CLIENT
-~~~
+## Server:
+```
 import socket
 
-from datetime import datetime
+# Create socket
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-s = socket.socket()
+host = "127.0.0.1"
+port = 12345
 
-s.bind(('localhost', 6000))
+# Bind and listen
+server.bind((host, port))
+server.listen(1)
 
-s.listen(5)
+print("Server waiting for connection...")
 
-c, addr = s.accept()
+conn, addr = server.accept()
+print("Connected to:", addr)
 
-print("Client Address :", addr)
+while True:
+    # Receive message from client
+    client_msg = conn.recv(1024).decode()
+    print("Client:", client_msg)
 
-now = datetime.now()
+    if client_msg.lower() == "exit":
+        break
 
-c.send(now.strftime("%d/%m/%Y %H:%M:%S").encode())
+    # Send message to client
+    msg = input("Server: ")
+    conn.send(msg.encode())
 
-ack = c.recv(1024).decode()
+    if msg.lower() == "exit":
+        break
 
-if ack:
-    print(ack)
-
-c.close()
-~~~
-## SERVER
-~~~
+conn.close()
+server.close()
+```
+## Client:
+```
 import socket
 
-s = socket.socket()
+# Create socket
+client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-s.connect(('localhost', 6000))
+host = "127.0.0.1"
+port = 12345
 
-print(s.getsockname())
+# Connect to server
+client.connect((host, port))
 
-print(s.recv(1024).decode())
+while True:
+    # Send message to server
+    msg = input("Client: ")
+    client.send(msg.encode())
 
-s.send("acknowledgement recived from the server".encode())
-~~~
-## Output
-<img width="1342" height="737" alt="WhatsApp Image 2026-10-31 at 10 54 12 AM" src="https://github.com/user-attachments/assets/f527ed98-ed71-4a88-a374-afac30335a95" />
+    if msg.lower() == "exit":
+        break
+
+    # Receive reply from server
+    server_msg = client.recv(1024).decode()
+    print("Server:", server_msg)
+
+    if server_msg.lower() == "exit":
+        break
+
+client.close()
+```
+## output
+## Simpleserver.py
+<img width="1427" height="332" alt="Screenshot 2026-10-27 091250" src="https://github.com/user-attachments/assets/19e6d1fe-744e-4239-aa09-2df5ec4bf36b" />
+## Simpleclient.py
+<img width="1436" height="277" alt="Screenshot 2026-10-27 091316" src="https://github.com/user-attachments/assets/90c73143-c2af-44ae-b6d9-c96f1aaf60be" />
 
 
 ## Result:
 
-Thus the study on Client Server Chat Applications has been performed.
-
+Thus the study on Client Server Chat Applications has been performed
